@@ -7,10 +7,19 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class GoogleApiHelper
 {
+    /**
+     * @var Google_Service_Analytics
+     */
     protected $service;
 
+    /**
+     * @var CacheContract
+     */
     protected $cache;
 
+    /**
+     * @var int
+     */
     protected $cacheLifeTimeInMinutes;
 
     public function __construct(Google_Client $client, CacheContract $cache)
@@ -23,11 +32,11 @@ class GoogleApiHelper
     /**
      * Query the Google Analytics Service with given parameters.
      *
-     * @param int      $id
-     * @param string   $startDate
-     * @param string   $endDate
-     * @param int      $metrics
-     * @param array    $others
+     * @param int    $id
+     * @param string $startDate
+     * @param string $endDate
+     * @param string $metrics
+     * @param array  $others
      *
      * @return mixed
      */
@@ -36,7 +45,6 @@ class GoogleApiHelper
         $cacheName = $this->determineCacheName(func_get_args());
 
         if ($this->useCache() && $this->cache->has($cacheName)) {
-
             return $this->cache->get($cacheName);
         }
 
@@ -78,8 +86,7 @@ class GoogleApiHelper
     {
         static $siteIds = null;
 
-        if (! is_null($siteIds))
-        {
+        if (! is_null($siteIds)) {
             return $siteIds;
         }
 
@@ -115,7 +122,7 @@ class GoogleApiHelper
     /**
      * Set the cache time.
      *
-     * @param  int             $cacheLifeTimeInMinutes
+     * @param  int  $cacheLifeTimeInMinutes
      * @return self
      */
     public function setCacheLifeTimeInMinutes($cacheLifeTimeInMinutes)

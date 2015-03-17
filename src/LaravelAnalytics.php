@@ -1,8 +1,8 @@
 <?php namespace Spatie\LaravelAnalytics;
 
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Support\Collection;
-use Carbon\Carbon;
 
 class LaravelAnalytics
 {
@@ -10,6 +10,7 @@ class LaravelAnalytics
      * @var Analytics
      */
     protected $client;
+
     /**
      * @var string
      */
@@ -17,7 +18,7 @@ class LaravelAnalytics
 
     /**
      * @param GoogleApiHelper $client
-     * @param string $siteId
+     * @param string          $siteId
      */
     public function __construct(GoogleApiHelper $client, $siteId = '')
     {
@@ -53,6 +54,10 @@ class LaravelAnalytics
     {
         $visitorData = [];
         $answer = $this->performQuery($startDate, $endDate, 'ga:visits,ga:pageviews', ['dimensions' => 'ga:'.$groupBy]);
+
+        if (is_null($answer->rows)) {
+            return new Collection([]);
+        }
 
         foreach ($answer->rows as $dateRow) {
             $visitorData[] = [$groupBy => Carbon::createFromFormat(($groupBy == 'yearMonth' ? 'Ym' : 'Ymd'), $dateRow[0]), 'visitors' => $dateRow[1], 'pageViews' => $dateRow[2]];
@@ -122,7 +127,7 @@ class LaravelAnalytics
      *
      * @param DateTime $startDate
      * @param DateTime $endDate
-     * @param $maxResults
+     * @param int      $maxResults
      *
      * @return Collection
      */
@@ -163,7 +168,7 @@ class LaravelAnalytics
      *
      * @param DateTime $startDate
      * @param DateTime $endDate
-     * @param $maxResults
+     * @param int      $maxResults
      *
      * @return Collection
      */
@@ -236,7 +241,7 @@ class LaravelAnalytics
     /**
      * Returns the site id (ga:xxxxxxx) for the given url.
      *
-     * @param $url
+     * @param string $url
      *
      * @throws \Exception
      *
@@ -248,11 +253,11 @@ class LaravelAnalytics
     }
 
     /**
-     * Call the query method on the autenthicated client.
+     * Call the query method on the authenticated client.
      *
      * @param DateTime $startDate
      * @param DateTime $endDate
-     * @param $metrics
+     * @param string   $metrics
      * @param array    $others
      *
      * @return mixed
@@ -275,7 +280,7 @@ class LaravelAnalytics
     /**
      * Returns an array with the current date and the date minus the number of days specified.
      *
-     * @param $numberOfDays
+     * @param int $numberOfDays
      *
      * @return array
      */
